@@ -189,8 +189,15 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), ui(new Ui::MainWi
         serversAction->setIcon(QIcon::fromTheme("server", QIcon::fromTheme("network-server")));
         serversAction->setToolTip(tr("Manage Minecraft servers."));
         connect(serversAction, &QAction::triggered, this, [this] {
-            ServerPanelDialog dialog(this);
-            dialog.exec();
+            // Non-modal so the main window stays usable and the panel can be minimized.
+            if (!m_serverPanel) {
+                m_serverPanel = new ServerPanelDialog(this);
+                m_serverPanel->setAttribute(Qt::WA_DeleteOnClose);
+                connect(m_serverPanel, &QObject::destroyed, this, [this] { m_serverPanel = nullptr; });
+            }
+            m_serverPanel->show();
+            m_serverPanel->raise();
+            m_serverPanel->activateWindow();
         });
         ui->mainToolBar->insertAction(ui->actionSettings, serversAction);
 
@@ -227,7 +234,8 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), ui(new Ui::MainWi
         ui->actionDISCORD->setVisible(!BuildConfig.DISCORD_URL.isEmpty());
         ui->actionREDDIT->setVisible(!BuildConfig.SUBREDDIT_URL.isEmpty());
 
-        ui->actionCheckUpdate->setVisible(APPLICATION->updaterEnabled());
+        // Fork: upstream's updater stays hidden (updates come from the fork's releases).
+        ui->actionCheckUpdate->setVisible(false);
 
 #ifndef Q_OS_MAC
         ui->actionAddToPATH->setVisible(false);

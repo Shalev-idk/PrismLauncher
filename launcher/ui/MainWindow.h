@@ -43,6 +43,7 @@
 #include <memory>
 
 #include <QMainWindow>
+#include <QPointer>
 #include <QProcess>
 #include <QTimer>
 
@@ -60,6 +61,7 @@ class BaseProfilerFactory;
 class InstanceView;
 class KonamiCode;
 class InstanceTask;
+class ServerPanelDialog;
 class LabeledToolButton;
 
 namespace Ui {
@@ -219,6 +221,7 @@ class MainWindow : public QMainWindow {
     void refreshCurrentInstance();
 
    private:
+    QPointer<ServerPanelDialog> m_serverPanel;
     void retranslateUi();
 
     void addInstance(const QString& url = QString(), const QMap<QString, QString>& extra_info = {});

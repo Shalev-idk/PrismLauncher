@@ -36,6 +36,8 @@
 ServerPanelDialog::ServerPanelDialog(QWidget* parent) : QDialog(parent)
 {
     setWindowTitle(tr("Servers"));
+    setWindowFlag(Qt::WindowMinimizeButtonHint, true);
+    setWindowFlag(Qt::WindowMaximizeButtonHint, true);
     resize(900, 600);
 
     auto* root = new QVBoxLayout(this);
