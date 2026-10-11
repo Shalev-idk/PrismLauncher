@@ -30,7 +30,12 @@ jobs:
           git config user.email "fork-sync@users.noreply.github.com"
           git remote add upstream https://github.com/PrismLauncher/PrismLauncher.git
           git fetch upstream develop
-          git merge --no-edit upstream/develop || { git merge --abort; echo "::error::merge conflict with upstream"; exit 1; }
+          # build.yml is trimmed in this fork (Windows x64 only): on conflict keep our version.
+          git merge --no-edit --no-commit upstream/develop || true
+          git checkout --ours .github/workflows/build.yml || true
+          git add .github/workflows/build.yml
+          if git diff --name-only --diff-filter=U | grep -q .; then git merge --abort; echo "::error::merge conflict with upstream"; exit 1; fi
+          git commit --no-edit || true
           git push origin HEAD
       - id: head
         run: echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
