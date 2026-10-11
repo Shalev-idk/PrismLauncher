@@ -1,0 +1,74 @@
+name: Fork release
+
+# Fork addition: daily, merge the newest upstream Prism Launcher into this fork
+# (keeping the Servers panel), build for Windows and publish a GitHub Release.
+
+on:
+  schedule:
+    - cron: '23 3 * * *'
+  workflow_dispatch:
+
+permissions: {}
+
+jobs:
+  sync:
+    name: Merge upstream
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    outputs:
+      sha: ${{ steps.head.outputs.sha }}
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+      - name: Merge upstream develop
+        # If the push is refused (e.g. upstream changed workflow files) we still build the current state.
+        continue-on-error: true
+        run: |
+          git config user.name "fork-sync"
+          git config user.email "fork-sync@users.noreply.github.com"
+          git remote add upstream https://github.com/PrismLauncher/PrismLauncher.git
+          git fetch upstream develop
+          git merge --no-edit upstream/develop || { git merge --abort; echo "::error::merge conflict with upstream"; exit 1; }
+          git push origin HEAD
+      - id: head
+        run: echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+
+  build:
+    name: Build
+    needs: sync
+    uses: ./.github/workflows/build.yml
+    with:
+      build-type: Release
+    permissions:
+      contents: read
+      id-token: write
+      packages: write
+
+  release:
+    name: Publish release
+    needs: [sync, build]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v5
+        with:
+          pattern: PrismLauncher-Windows-MSVC-*
+          path: artifacts
+      - name: Package
+        run: |
+          cd artifacts
+          for d in */; do (cd "$d" && zip -qr "../${d%/}.zip" .); done
+          ls -la
+      - name: Create release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          tag="fork-$(date -u +%Y%m%d)-$(echo '${{ needs.sync.outputs.sha }}' | cut -c1-7)"
+          gh release create "$tag" artifacts/*.zip artifacts/*Setup*/*.exe \
+            --repo "${{ github.repository }}" --title "Prism + Servers panel $tag" \
+            --notes "Daily build: newest upstream Prism Launcher plus the Servers panel." || \
+          gh release create "$tag" artifacts/*.zip --repo "${{ github.repository }}" \
+            --title "Prism + Servers panel $tag" --notes "Daily build."
