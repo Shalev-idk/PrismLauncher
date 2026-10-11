@@ -256,12 +256,12 @@ void ServerPanelDialog::tailLog()
     if (m_logPos == 0 && f.size() > 60000)
         m_logPos = f.size() - 60000;
     f.seek(m_logPos);
-    QByteArray data = f.readAll();
+    QByteArray chunk = f.readAll();
     m_logPos = f.pos();
-    if (!data.isEmpty()) {
+    if (!chunk.isEmpty()) {
         auto* sb = m_console->verticalScrollBar();
         bool bottom = sb->value() >= sb->maximum() - 4;
-        m_console->appendPlainText(QString::fromUtf8(data).trimmed());
+        m_console->appendPlainText(QString::fromUtf8(chunk).trimmed());
         if (bottom)
             sb->setValue(sb->maximum());
     }
