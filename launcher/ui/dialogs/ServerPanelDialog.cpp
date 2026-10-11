@@ -304,7 +304,17 @@ void ServerPanelDialog::startServer()
         return;
     }
     // start.bat is the only correct launcher (Fabric, 8 GB). Detached so it keeps running if this launcher closes.
-    QProcess::startDetached("cmd.exe", { "/c", "start", "\"Minecraft server\"", "/min", "start.bat" }, dir());
+    QProcess p;
+#ifdef Q_OS_WIN
+    p.setProgram("cmd.exe");
+    // Native arguments: Qt's normal quoting breaks `start "title"`.
+    p.setNativeArguments("/c start \"MCServer\" /min start.bat");
+#else
+    p.setProgram("sh");
+    p.setArguments({ "-c", "./start.sh" });
+#endif
+    p.setWorkingDirectory(dir());
+    p.startDetached();
 }
 
 void ServerPanelDialog::stopServer()

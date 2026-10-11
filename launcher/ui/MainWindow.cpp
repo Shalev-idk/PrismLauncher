@@ -193,6 +193,9 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), ui(new Ui::MainWi
             dialog.exec();
         });
         ui->mainToolBar->insertAction(ui->actionSettings, serversAction);
+
+        // Fork: updates come from the fork's releases (see tools/update-prism.ps1), not upstream's updater.
+        ui->actionCheckUpdate->setVisible(false);
     }
 
     // set the menu for the folders help, accounts, and export tool buttons
