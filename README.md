@@ -123,3 +123,5 @@ This is a fork of [Prism Launcher](https://prismlauncher.org) (GPL-3.0) that add
 (toolbar button) for managing a local Minecraft server: start/stop/restart, live console and commands,
 `server.properties` editor, mods and backups. Prism Launcher and its contributors keep their copyright;
 this fork stays under GPL-3.0.
+
+Servers panel setup: the panel defaults to `C:\MinecraftServer`; use "Add server..." for other folders.
