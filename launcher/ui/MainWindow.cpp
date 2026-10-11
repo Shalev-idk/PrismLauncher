@@ -95,6 +95,7 @@
 #include "ui/GuiUtil.h"
 #include "ui/ViewLogWindow.h"
 #include "ui/dialogs/AboutDialog.h"
+#include "ui/dialogs/ServerPanelDialog.h"
 #include "ui/dialogs/CopyInstanceDialog.h"
 #include "ui/dialogs/CreateShortcutDialog.h"
 #include "ui/dialogs/CustomMessageBox.h"
@@ -180,6 +181,18 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), ui(new Ui::MainWi
         ui->instanceToolBar->insertWidgetBefore(ui->actionLaunchInstance, renameButton);
 
         ui->instanceToolBar->insertSeparator(ui->actionLaunchInstance);
+    }
+
+    // Servers panel (fork addition)
+    {
+        auto* serversAction = new QAction(tr("Servers"), this);
+        serversAction->setIcon(QIcon::fromTheme("server", QIcon::fromTheme("network-server")));
+        serversAction->setToolTip(tr("Manage Minecraft servers."));
+        connect(serversAction, &QAction::triggered, this, [this] {
+            ServerPanelDialog dialog(this);
+            dialog.exec();
+        });
+        ui->mainToolBar->insertAction(ui->actionSettings, serversAction);
     }
 
     // set the menu for the folders help, accounts, and export tool buttons

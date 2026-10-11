@@ -114,3 +114,12 @@ If you do not agree with these terms and conditions, then remove the associated 
 All launcher code is available under the GPL-3.0-only license.
 
 The logo and related assets are under the CC BY-SA 4.0 license.
+
+---
+
+## Fork notice
+
+This is a fork of [Prism Launcher](https://prismlauncher.org) (GPL-3.0) that adds a **Servers** panel
+(toolbar button) for managing a local Minecraft server: start/stop/restart, live console and commands,
+`server.properties` editor, mods and backups. Prism Launcher and its contributors keep their copyright;
+this fork stays under GPL-3.0.
